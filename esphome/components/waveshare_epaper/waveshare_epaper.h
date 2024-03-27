@@ -289,6 +289,7 @@ class GDEW0154M09 : public WaveshareEPaper {
   void display() override;
   void dump_config() override;
   void deep_sleep() override;
+  using WaveshareEPaper::init_internal_;
 
  protected:
   int get_width_internal() override;
