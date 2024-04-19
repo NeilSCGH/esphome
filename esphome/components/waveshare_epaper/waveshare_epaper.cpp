@@ -2436,7 +2436,7 @@ void HOT WaveshareEPaper4P01InF::display() {
   }
 
   // INITIALIZATION
-  ESP_LOGI(TAG, "Initialise the display v0.4");
+  ESP_LOGI(TAG, "Initialise the display v0.5");
   this->initialize();
 
   // COMMAND DATA START TRANSMISSION
@@ -2486,9 +2486,9 @@ void HOT WaveshareEPaper4P01InF::display() {
   this->command(0x02);
   this->wait_until_idle_();
 
-  ESP_LOGI(TAG, "Set the display to deep sleep");
-  this->command(0x07);
-  this->data(0xA5);
+  //ESP_LOGI(TAG, "Set the display to deep sleep");
+  //this->command(0x07);
+  //this->data(0xA5);
 }
 int WaveshareEPaper4P01InF::get_width_internal() { return 640; }
 int WaveshareEPaper4P01InF::get_height_internal() { return 400; }
