@@ -2380,6 +2380,7 @@ void WaveshareEPaper7P5In::dump_config() {
   LOG_PIN("  Busy Pin: ", this->busy_pin_);
   LOG_UPDATE_INTERVAL(this);
 }
+
 void WaveshareEPaper4P01InF::initialize() {
   if (this->buffers_[0] == nullptr) {
     ESP_LOGE(TAG, "Buffer unavailable!");
@@ -2390,7 +2391,6 @@ void WaveshareEPaper4P01InF::initialize() {
   delay(20);
   this->wait_until_idle_();
 
-  // COMMAND CMDH
   this->command(0x00);
   this->data(0x2F);
   this->data(0x00);
@@ -2441,6 +2441,11 @@ void HOT WaveshareEPaper4P01InF::display() {
 
   // COMMAND DATA START TRANSMISSION
   ESP_LOGI(TAG, "Sending data to the display");
+  this->command(0x61);
+  this->data(0x02);
+  this->data(0x80);
+  this->data(0x01);
+  this->data(0x90);
   this->command(0x10);
   uint32_t small_buffer_length = this->get_buffer_length_() / NUM_BUFFERS;
   uint8_t byte_to_send;
@@ -2474,13 +2479,11 @@ void HOT WaveshareEPaper4P01InF::display() {
   // COMMAND REFRESH SCREEN
   ESP_LOGI(TAG, "Refresh the display");
   this->command(0x12);
-  this->data(0x00);
   this->wait_until_idle_();
 
   // COMMAND POWER OFF
   ESP_LOGI(TAG, "Power off the display");
   this->command(0x02);
-  this->data(0x00);
   this->wait_until_idle_();
 
   ESP_LOGI(TAG, "Set the display to deep sleep");
@@ -2498,7 +2501,6 @@ void WaveshareEPaper4P01InF::dump_config() {
   LOG_PIN("  Busy Pin: ", this->busy_pin_);
   LOG_UPDATE_INTERVAL(this);
 }
-
 bool WaveshareEPaper4P01InF::wait_until_idle_() {
   if (this->busy_pin_ == nullptr) {
     return true;
