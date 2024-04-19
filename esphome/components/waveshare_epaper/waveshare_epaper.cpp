@@ -2391,95 +2391,41 @@ void WaveshareEPaper4P01InF::initialize() {
   this->wait_until_idle_();
 
   // COMMAND CMDH
-  this->command(0xAA);
-  this->data(0x49);
-  this->data(0x55);
-  this->data(0x20);
-  this->data(0x08);
-  this->data(0x09);
-  this->data(0x18);
+  this->command(0x00);
+  this->data(0x2F);
+  this->data(0x00);
 
   this->command(0x01);
-  this->data(0x3F);
+  this->data(0x37);
   this->data(0x00);
-  this->data(0x32);
-  this->data(0x2A);
-  this->data(0x0E);
-  this->data(0x2A);
-
-  this->command(0x00);
-  this->data(0x5F);
-  this->data(0x69);
+  this->data(0x05);
+  this->data(0x05);
 
   this->command(0x03);
   this->data(0x00);
-  this->data(0x54);
-  this->data(0x00);
-  this->data(0x44);
-
-  this->command(0x05);
-  this->data(0x40);
-  this->data(0x1F);
-  this->data(0x1F);
-  this->data(0x2C);
 
   this->command(0x06);
-  this->data(0x6F);
-  this->data(0x1F);
-  this->data(0x1F);
-  this->data(0x22);
+  this->data(0xC7);
+  this->data(0xC7);
+  this->data(0x1D);
 
-  this->command(0x08);
-  this->data(0x6F);
-  this->data(0x1F);
-  this->data(0x1F);
-  this->data(0x22);
-
-  // COMMAND IPC
-  this->command(0x13);
-  this->data(0x00);
-  this->data(0x04);
-
-  this->command(0x30);
-  this->data(0x3C);
-
-  // COMMAND TSE
   this->command(0x41);
   this->data(0x00);
 
   this->command(0x50);
-  this->data(0x3F);
+  this->data(0x37);
 
   this->command(0x60);
-  this->data(0x02);
-  this->data(0x00);
+  this->data(0x22);
 
   this->command(0x61);
-  this->data(0x03);
-  this->data(0x20);
+  this->data(0x02);
+  this->data(0x80);
   this->data(0x01);
-  this->data(0xE0);
-
-  this->command(0x82);
-  this->data(0x1E);
-
-  this->command(0x84);
-  this->data(0x00);
-
-  // COMMAND AGID
-  this->command(0x86);
-  this->data(0x00);
+  this->data(0x90);
 
   this->command(0xE3);
-  this->data(0x2F);
-
-  // COMMAND CCSET
-  this->command(0xE0);
-  this->data(0x00);
-
-  // COMMAND TSSET
-  this->command(0xE6);
-  this->data(0x00);
+  this->data(0xAA);
 
   ESP_LOGI(TAG, "Display initialized successfully");
 }
