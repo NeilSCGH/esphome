@@ -2380,6 +2380,196 @@ void WaveshareEPaper7P5In::dump_config() {
   LOG_PIN("  Busy Pin: ", this->busy_pin_);
   LOG_UPDATE_INTERVAL(this);
 }
+void WaveshareEPaper4P01InF::initialize() {
+  if (this->buffers_[0] == nullptr) {
+    ESP_LOGE(TAG, "Buffer unavailable!");
+    return;
+  }
+
+  this->reset_();
+  delay(20);
+  this->wait_until_idle_();
+
+  // COMMAND CMDH
+  this->command(0xAA);
+  this->data(0x49);
+  this->data(0x55);
+  this->data(0x20);
+  this->data(0x08);
+  this->data(0x09);
+  this->data(0x18);
+
+  this->command(0x01);
+  this->data(0x3F);
+  this->data(0x00);
+  this->data(0x32);
+  this->data(0x2A);
+  this->data(0x0E);
+  this->data(0x2A);
+
+  this->command(0x00);
+  this->data(0x5F);
+  this->data(0x69);
+
+  this->command(0x03);
+  this->data(0x00);
+  this->data(0x54);
+  this->data(0x00);
+  this->data(0x44);
+
+  this->command(0x05);
+  this->data(0x40);
+  this->data(0x1F);
+  this->data(0x1F);
+  this->data(0x2C);
+
+  this->command(0x06);
+  this->data(0x6F);
+  this->data(0x1F);
+  this->data(0x1F);
+  this->data(0x22);
+
+  this->command(0x08);
+  this->data(0x6F);
+  this->data(0x1F);
+  this->data(0x1F);
+  this->data(0x22);
+
+  // COMMAND IPC
+  this->command(0x13);
+  this->data(0x00);
+  this->data(0x04);
+
+  this->command(0x30);
+  this->data(0x3C);
+
+  // COMMAND TSE
+  this->command(0x41);
+  this->data(0x00);
+
+  this->command(0x50);
+  this->data(0x3F);
+
+  this->command(0x60);
+  this->data(0x02);
+  this->data(0x00);
+
+  this->command(0x61);
+  this->data(0x03);
+  this->data(0x20);
+  this->data(0x01);
+  this->data(0xE0);
+
+  this->command(0x82);
+  this->data(0x1E);
+
+  this->command(0x84);
+  this->data(0x00);
+
+  // COMMAND AGID
+  this->command(0x86);
+  this->data(0x00);
+
+  this->command(0xE3);
+  this->data(0x2F);
+
+  // COMMAND CCSET
+  this->command(0xE0);
+  this->data(0x00);
+
+  // COMMAND TSSET
+  this->command(0xE6);
+  this->data(0x00);
+
+  ESP_LOGI(TAG, "Display initialized successfully");
+}
+void HOT WaveshareEPaper4P01InF::display() {
+  if (this->buffers_[0] == nullptr) {
+    ESP_LOGE(TAG, "Buffer unavailable!");
+    return;
+  }
+
+  // INITIALIZATION
+  ESP_LOGI(TAG, "Initialise the display");
+  this->initialize();
+
+  // COMMAND DATA START TRANSMISSION
+  ESP_LOGI(TAG, "Sending data to the display");
+  this->command(0x10);
+  uint32_t small_buffer_length = this->get_buffer_length_() / NUM_BUFFERS;
+  uint8_t byte_to_send;
+  for (auto &buffer : this->buffers_) {
+    for (uint32_t buffer_pos = 0; buffer_pos < small_buffer_length; buffer_pos += 3) {
+      std::bitset<24> triplet =
+          buffer[buffer_pos + 0] << 16 | buffer[buffer_pos + 1] << 8 | buffer[buffer_pos + 2] << 0;
+      // 8 bitset<3> are stored in 3 bytes
+      // |aaabbbaa|abbbaaab|bbaaabbb|
+      // | byte 1 | byte 2 | byte 3 |
+      byte_to_send = ((triplet >> 17).to_ulong() & 0b01110000) | ((triplet >> 18).to_ulong() & 0b00000111);
+      this->data(byte_to_send);
+
+      byte_to_send = ((triplet >> 11).to_ulong() & 0b01110000) | ((triplet >> 12).to_ulong() & 0b00000111);
+      this->data(byte_to_send);
+
+      byte_to_send = ((triplet >> 5).to_ulong() & 0b01110000) | ((triplet >> 6).to_ulong() & 0b00000111);
+      this->data(byte_to_send);
+
+      byte_to_send = ((triplet << 1).to_ulong() & 0b01110000) | ((triplet << 0).to_ulong() & 0b00000111);
+      this->data(byte_to_send);
+    }
+    App.feed_wdt();
+  }
+
+  // COMMAND POWER ON
+  ESP_LOGI(TAG, "Power on the display");
+  this->command(0x04);
+  this->wait_until_idle_();
+
+  // COMMAND REFRESH SCREEN
+  ESP_LOGI(TAG, "Refresh the display");
+  this->command(0x12);
+  this->data(0x00);
+  this->wait_until_idle_();
+
+  // COMMAND POWER OFF
+  ESP_LOGI(TAG, "Power off the display");
+  this->command(0x02);
+  this->data(0x00);
+  this->wait_until_idle_();
+
+  ESP_LOGI(TAG, "Set the display to deep sleep");
+  this->command(0x07);
+  this->data(0xA5);
+}
+int WaveshareEPaper4P01InF::get_width_internal() { return 640; }
+int WaveshareEPaper4P01InF::get_height_internal() { return 400; }
+uint32_t WaveshareEPaper4P01InF::idle_timeout_() { return 35000; }
+void WaveshareEPaper4P01InF::dump_config() {
+  LOG_DISPLAY("", "Waveshare E-Paper", this);
+  ESP_LOGCONFIG(TAG, "  Model: 4.01in-F");
+  LOG_PIN("  Reset Pin: ", this->reset_pin_);
+  LOG_PIN("  DC Pin: ", this->dc_pin_);
+  LOG_PIN("  Busy Pin: ", this->busy_pin_);
+  LOG_UPDATE_INTERVAL(this);
+}
+
+bool WaveshareEPaper4P01InF::wait_until_idle_() {
+  if (this->busy_pin_ == nullptr) {
+    return true;
+  }
+  const uint32_t start = millis();
+  while (this->busy_pin_->digital_read()) {
+    if (millis() - start > this->idle_timeout_()) {
+      ESP_LOGE(TAG, "Timeout while displaying image!");
+      return false;
+    }
+    App.feed_wdt();
+    delay(10);
+  }
+  delay(200);  // NOLINT
+  return true;
+}
+
 void WaveshareEPaper7P3InF::initialize() {
   if (this->buffers_[0] == nullptr) {
     ESP_LOGE(TAG, "Buffer unavailable!");
