@@ -2436,7 +2436,7 @@ void HOT WaveshareEPaper4P01InF::display() {
   }
 
   // INITIALIZATION
-  ESP_LOGI(TAG, "Initialise the display");
+  ESP_LOGI(TAG, "Initialise the display v0.4");
   this->initialize();
 
   // COMMAND DATA START TRANSMISSION
