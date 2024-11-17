@@ -111,8 +111,14 @@ static const uint8_t PARTIAL_UPD_2IN9_LUT[PARTIAL_UPD_2IN9_LUT_SIZE] =
 };
 // clang-format on
 
-void WaveshareEPaperBase::setup_pins_() {
+void WaveshareEPaperBase::setup() {
   this->init_internal_(this->get_buffer_length_());
+  this->setup_pins_();//was in setup
+  this->spi_setup();
+  this->reset_();
+  this->initialize();//was in setup
+}
+void WaveshareEPaperBase::setup_pins_() {
   this->dc_pin_->setup();  // OUTPUT
   this->dc_pin_->digital_write(false);
   if (this->reset_pin_ != nullptr) {
@@ -122,9 +128,6 @@ void WaveshareEPaperBase::setup_pins_() {
   if (this->busy_pin_ != nullptr) {
     this->busy_pin_->setup();  // INPUT
   }
-  this->spi_setup();
-
-  this->reset_();
 }
 float WaveshareEPaperBase::get_setup_priority() const { return setup_priority::PROCESSOR; }
 void WaveshareEPaperBase::command(uint8_t value) {

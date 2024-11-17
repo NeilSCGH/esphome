@@ -27,10 +27,7 @@ class WaveshareEPaperBase : public display::DisplayBuffer,
 
   void update() override;
 
-  void setup() override {
-    this->setup_pins_();
-    this->initialize();
-  }
+  void setup() override;
 
   void on_safe_shutdown() override;
 
