@@ -193,25 +193,22 @@ void WaveshareEPaper7C::init_internal_(uint32_t buffer_length) {
 }
 uint8_t WaveshareEPaper7C::color_to_hex(Color color) {
   uint8_t hex_code;
-
   if (color.red > 127) {
-    if (color.blue > 127) {
-      if (color.green > 127) {
+    if (color.green > 170) {
+      if (color.blue > 127) {
         hex_code = 0x1;  // White
       } else {
         hex_code = 0x5;  // Yellow
       }
+    } else if (color.green > 85) {
+      hex_code = 0x6;  // Orange
     } else {
-      if (color.green > 85 && color.green < 170) {
-        hex_code = 0x6;  // Orange
-      } else {
-        hex_code = 0x4;  // Red
-      }
+      hex_code = 0x4;  // Red (or Magenta)
     }
   } else {
     if (color.green > 127) {
       if (color.blue > 127) {
-        hex_code = 0x3;  // Blue
+        hex_code = 0x3;  // Cyan -> Blue
       } else {
         hex_code = 0x2;  // Green
       }
