@@ -113,10 +113,10 @@ static const uint8_t PARTIAL_UPD_2IN9_LUT[PARTIAL_UPD_2IN9_LUT_SIZE] =
 
 void WaveshareEPaperBase::setup() {
   this->init_internal_(this->get_buffer_length_());
-  this->setup_pins_();//was in setup
+  this->setup_pins_();
   this->spi_setup();
   this->reset_();
-  this->initialize();//was in setup
+  this->initialize();
 }
 void WaveshareEPaperBase::setup_pins_() {
   this->dc_pin_->setup();  // OUTPUT
@@ -177,7 +177,14 @@ void WaveshareEPaper::fill(Color color) {
   for (uint32_t i = 0; i < this->get_buffer_length_(); i++)
     this->buffer_[i] = fill;
 }
-void WaveshareEPaper7C::init_internal_(uint32_t buffer_length) {
+void WaveshareEPaper7C::setup() {
+  this->init_internal_7c_(this->get_buffer_length_());
+  this->setup_pins_();
+  this->spi_setup();
+  this->reset_();
+  this->initialize();
+}
+void WaveshareEPaper7C::init_internal_7c_(uint32_t buffer_length) {
   ExternalRAMAllocator<uint8_t> allocator(ExternalRAMAllocator<uint8_t>::ALLOW_FAILURE);
   uint32_t small_buffer_length = buffer_length / NUM_BUFFERS;
 
